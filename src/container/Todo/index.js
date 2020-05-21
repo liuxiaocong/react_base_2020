@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { useDispatch } from 'redux-react-hook';
 import todoActions from '../../data/todo/actions';
 import styles from './styles.css';
+import store from '../../store';
 
 const Todo = ({ todos, gitData, addTodo, loadGitInfo }) => {
-
+  //console.log(store.getState());
   const [todoValue, setTodoValue] = useState('');
   const dispatch = useDispatch();
   return (
