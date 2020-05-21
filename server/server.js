@@ -2,13 +2,17 @@ import { renderToString } from 'react-dom/server'
 import path from 'path';
 import Express from 'express';
 import React from 'react';
-import App from '../src/App';
+import App from '../src/container/Home';
 import { Provider } from 'react-redux';
 import { StoreContext } from 'redux-react-hook';
 import store from '../src/store';
+const RES_PATH = path.resolve(__dirname, '../build/');
 
 const app = Express();
+app.use('/static', Express.static(path.join(__dirname, '../build/static')));
 app.use(handleRender);
+
+
 
 function renderFullPage(html, preloadedState) {
   return `
@@ -44,8 +48,10 @@ function handleRender(req, res) {
   //  </React.StrictMode>,
   //);
   const html = renderToString(<App />);
-  const preloadedState = store.getState()
-  res.send(renderFullPage(html, preloadedState));
+  const preloadedState = store.getState();
+  console.log(html);
+  const result = renderFullPage(html, preloadedState);
+  res.send(result);
 }
 
 var server = app.listen(8081, function() {
