@@ -4,6 +4,13 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.6",
+    "@babel/plugin-transform-async-to-generator": "^7.8.3",
+    "@babel/plugin-transform-object-assign": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/polyfill": "^7.8.7",
+    "@babel/register": "^7.9.0",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -30,6 +37,7 @@
     "eslint-plugin-react-hooks": "^1.6.1",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "4.3.0",
+    "fs": "^0.0.1-security",
     "fs-extra": "^8.1.0",
     "html-webpack-plugin": "4.0.0-beta.11",
     "identity-obj-proxy": "3.0.0",
@@ -74,7 +82,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "server": "cross-env NODE_ENV=test nodemon --exec babel-node server/index.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -139,11 +148,6 @@
     "watchPlugins": [
       "jest-watch-typeahead/filename",
       "jest-watch-typeahead/testname"
-    ]
-  },
-  "babel": {
-    "presets": [
-      "react-app"
     ]
   }
 }
