@@ -2,42 +2,41 @@ import { renderToString } from 'react-dom/server'
 import path from 'path';
 import Express from 'express';
 import React from 'react';
-import App from '../src/container/Home';
+import App from '../src/App';
 import { Provider } from 'react-redux';
 import { StoreContext } from 'redux-react-hook';
 import store from '../src/store';
-const RES_PATH = path.resolve(__dirname, '../build/');
+const Promise = require("bluebird");
+const cheerio = require("cheerio");
+const fs = require("fs");
+const readFileAsync = Promise.promisify(fs.readFile);
 
 const app = Express();
 app.use('/static', Express.static(path.join(__dirname, '../build/static')));
 app.use(handleRender);
 
+async function loadHTMLTemplate(path) {
+  try {
+    let content = await readFileAsync(path);
+    return cheerio.load(content);
 
-
-function renderFullPage(html, preloadedState) {
-  return `
-    <!doctype html>
-    <html>
-      <head>
-        <title>Redux Universal Example</title>
-      </head>
-      <body>
-        <div id="root">${html}</div>
-        <script>
-          // 警告：关于在 HTML 中嵌入 JSON 的安全问题，请查看以下文档
-          // http://redux.js.org/recipes/ServerRendering.html#security-considerations
-          window.__PRELOADED_STATE__ = ${JSON.stringify(preloadedState).replace(
-    /</g,
-    '\\u003c'
-  )}
-        </script>
-        <script src="/static/bundle.js"></script>
-      </body>
-    </html>
-    `
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 }
 
-function handleRender(req, res) {
+async function renderFullPage(currentHtml, preloadedState) {
+  let $ = await loadHTMLTemplate(path.resolve(__dirname, '../build/index.html'));
+  if (!$) {
+    return '';
+  }
+  let html = $.html();
+  html = html.replace('<div id="root"></div>', '<div id="root">' + currentHtml + '</div>');
+  return html;
+}
+
+async function handleRender(req, res) {
   //const html = renderToString(
   //  <React.StrictMode>
   //    <Provider store={store}>
@@ -49,8 +48,7 @@ function handleRender(req, res) {
   //);
   const html = renderToString(<App />);
   const preloadedState = store.getState();
-  console.log(html);
-  const result = renderFullPage(html, preloadedState);
+  const result = await renderFullPage(html, preloadedState);
   res.send(result);
 }
 
